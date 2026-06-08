@@ -1,0 +1,40 @@
+{
+  "name": "LedgerBrain",
+  "description": "LedgerBrain / LedgerCore provides x402 pay-per-use KYA, KYT, and KYE crypto compliance reports for AI agents.",
+  "url": "https://ledgerbrain.io/x402",
+  "api_host": "https://api.ledgercore.io",
+  "x402_discovery": "https://api.ledgercore.io/.well-known/x402",
+  "openapi": "https://api.ledgercore.io/openapi.json",
+  "catalog": "https://api.ledgercore.io/api/v1/x402/catalog",
+  "portal": "https://api.ledgercore.io/api/v1/portals/x402",
+  "payment": {
+    "protocol": "x402",
+    "version": "v2",
+    "network": "Base mainnet",
+    "token": "USDC",
+    "price": "1.00 USDC per report"
+  },
+  "capabilities": [
+    "KYA address risk reports before sending funds to a receiving address",
+    "KYT transaction risk reports when receiving or reviewing a payment",
+    "KYE entity due diligence reports for counterparty context"
+  ],
+  "tags": [
+    "x402",
+    "KYA",
+    "KYT",
+    "KYE",
+    "crypto compliance",
+    "AI agents",
+    "pay-per-use",
+    "pay-as-you-go",
+    "address risk",
+    "transaction risk",
+    "entity due diligence",
+    "wallet screening",
+    "risk score",
+    "Base",
+    "USDC",
+    "no API key required"
+  ]
+}
