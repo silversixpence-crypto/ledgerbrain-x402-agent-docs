@@ -1,0 +1,311 @@
+# LedgerCore / LedgerBrain — x402 pay-per-use KYA, KYT, and KYE compliance API for AI agents
+
+Run crypto address risk reports, transaction risk screening, entity due diligence, compliance risk
+screening, and auditable compliance reports via x402 payments. No LedgerBrain API key required
+for x402 endpoints.
+
+Canonical API host: https://api.ledgercore.io
+
+---
+
+## Service overview
+
+LedgerBrain / LedgerCore is a crypto compliance intelligence service. It exposes three report
+types — KYA, KYT, and KYE — as pay-per-use x402 resources on Base mainnet.
+
+AI agents, payment bots, treasury tools, wallets, marketplaces, and automation systems use
+LedgerBrain to get compliance risk context at the moment of payment, without pre-registering
+or managing a LedgerBrain API key. Access is gated by x402 USDC payment only.
+
+---
+
+## Why agents use LedgerBrain / LedgerCore
+
+- No pre-registration: no account creation, no API key management.
+- Pay only for the reports you run.
+- Works with any x402-capable client or wallet.
+- Supports address risk (KYA), transaction risk (KYT), and entity due diligence (KYE).
+- Provides compliance risk context including AML/sanctions-related risk context where available.
+- Useful in pre-payment address screening, post-payment transaction review, and counterparty
+  due diligence workflows.
+
+---
+
+## Report types
+
+### KYA — Know Your Address (address risk report)
+
+Use before sending funds to a receiving crypto address, or when screening a wallet for risk.
+
+Returns: risk score, risk level, entity attribution, exposure breakdown, compliance risk context,
+and AML/sanctions-related risk context where available in the report.
+
+Endpoint: POST https://api.ledgercore.io/api/v1/x402/kya/report
+Price: 1.00 USDC per report
+
+Request schema:
+
+```json
+{
+  "address": "1A1zP1eP5QGefi2DMPTfTL5SLmv7Divfna",
+  "chain": "bitcoin"
+}
+```
+
+Required: `address` (blockchain address to analyze), `chain`.
+Optional: `asset` (ERC-20 contract address, ethereum only), `reference_id`.
+
+Supported chains: `bitcoin`, `ethereum`, `solana`, `binance-smart-chain`, `tron`, `ripple`.
+
+Use KYA for:
+- receiving address screening before sending crypto
+- wallet risk scoring
+- counterparty address risk
+- payment recipient checks
+- inbound-funds source address checks
+
+---
+
+### KYT — Know Your Transaction (transaction risk report)
+
+Use after receiving a crypto payment or when reviewing a transaction hash.
+
+Returns: transaction risk score, risk level, compliance flags, transaction details, and
+AML/sanctions-related risk context where available in the report.
+
+Endpoint: POST https://api.ledgercore.io/api/v1/x402/kyt/report
+Price: 1.00 USDC per report
+
+Request schema:
+
+```json
+{
+  "txid": "4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b",
+  "chain": "bitcoin"
+}
+```
+
+Required: `txid` (transaction ID, 64 hex chars; 0x prefix optional for ETH), `chain`.
+Important: use `txid`, not `tx_hash`.
+Optional: `asset` (ERC-20 contract address, ethereum only), `timeout` (ms, default 300000),
+`reference_id`.
+
+Use KYT for:
+- incoming transaction review after receiving a payment
+- payment fulfillment checks
+- transaction risk scoring
+- treasury monitoring
+- transfer-level compliance review
+
+---
+
+### KYE — Know Your Entity (entity intelligence report)
+
+Use when an agent needs context about a counterparty, exchange, service, or wallet cluster.
+
+Returns: entity intelligence profile including entity type, aliases, beneficial owners,
+executives, licenses, timeline, risk assessments, and locations where available.
+
+Endpoint: POST https://api.ledgercore.io/api/v1/x402/kye/report
+Price: 1.00 USDC per report
+
+Request schema:
+
+```json
+{
+  "name": "Binance"
+}
+```
+
+Required: `name` (entity name to look up, minimum 2 characters, e.g. `"Binance"`, `"Luno"`).
+The top matching entity is returned.
+
+Use KYE for:
+- entity due diligence
+- counterparty intelligence
+- exchange or service context
+- entity risk context
+- compliance enrichment
+
+---
+
+## Pricing
+
+| Report | Price |
+|--------|-------|
+| KYA — address risk | 1.00 USDC |
+| KYT — transaction risk | 1.00 USDC |
+| KYE — entity intelligence | 1.00 USDC |
+
+Pricing is confirmed from the live catalog: https://api.ledgercore.io/api/v1/x402/catalog
+Always check the live catalog for current pricing.
+
+---
+
+## x402 payment flow (v2)
+
+LedgerBrain uses x402 version 2.
+
+Step-by-step:
+
+1. (Optional) Fetch the catalog to discover payable resources and schemas:
+   GET https://api.ledgercore.io/api/v1/x402/catalog
+
+2. POST the chosen paid endpoint (KYA, KYT, or KYE) without any payment header.
+
+3. The server responds with:
+   HTTP 402 Payment Required
+   PAYMENT-REQUIRED: <challenge with payTo, price, network, token>
+
+4. Parse the PAYMENT-REQUIRED header to extract:
+   - payTo: the receiving wallet address for payment
+   - price: the amount (1.00 USDC)
+   - network: base
+   - token: USDC contract address on Base
+
+5. Pay using your x402-capable client, wallet, or SDK.
+   Payment is USDC on Base mainnet.
+
+6. Retry the original request, adding:
+   PAYMENT-SIGNATURE: <your signed payment proof>
+
+7. The server verifies payment and returns the compliance report.
+
+Notes:
+- Normal curl or fetch alone cannot complete x402 payment — you need an x402-capable client.
+- Do not share or log the PAYMENT-SIGNATURE value beyond your immediate workflow.
+- No LedgerBrain API key is required for x402 endpoints.
+
+---
+
+## Endpoints
+
+### Discovery endpoints (free, no payment needed)
+
+| Method | URL | Purpose |
+|--------|-----|---------|
+| GET | https://api.ledgercore.io/api/v1/x402/health | Service health check |
+| GET | https://api.ledgercore.io/api/v1/x402/catalog | x402 catalog with payable resources and pricing |
+| GET | https://api.ledgercore.io/.well-known/x402 | x402 discovery document |
+| GET | https://api.ledgercore.io/openapi.json | OpenAPI spec |
+| GET | https://api.ledgercore.io/api/v1/portals/x402 | Human-readable API portal |
+
+### Paid report endpoints
+
+| Method | URL | Report | Price |
+|--------|-----|--------|-------|
+| POST | https://api.ledgercore.io/api/v1/x402/kya/report | KYA address risk | 1.00 USDC |
+| POST | https://api.ledgercore.io/api/v1/x402/kyt/report | KYT transaction risk | 1.00 USDC |
+| POST | https://api.ledgercore.io/api/v1/x402/kye/report | KYE entity intelligence | 1.00 USDC |
+
+---
+
+## Discovery URLs
+
+| Resource | URL |
+|----------|-----|
+| x402 discovery | https://api.ledgercore.io/.well-known/x402 |
+| x402 catalog | https://api.ledgercore.io/api/v1/x402/catalog |
+| OpenAPI spec | https://api.ledgercore.io/openapi.json |
+| API portal | https://api.ledgercore.io/api/v1/portals/x402 |
+| LedgerBrain x402 page | https://ledgerbrain.io/x402 |
+| x402scan listing | https://www.x402scan.com/server/694cd5d6-fddf-4a2f-be96-832b649909f7 |
+| LedgerBrain website | https://ledgerbrain.io |
+| llms.txt | https://api.ledgercore.io/llms.txt |
+| agent.json | https://ledgerbrain.io/.well-known/agent.json |
+| api-catalog | https://ledgerbrain.io/.well-known/api-catalog |
+
+---
+
+## Example agent prompts
+
+These prompts illustrate how an agent could invoke LedgerBrain via x402.
+
+> "Find and buy a LedgerBrain KYA address risk report using x402 for address
+> 1A1zP1eP5QGefi2DMPTfTL5SLmv7Divfna on bitcoin. Max spend: 1 USDC."
+
+> "Use LedgerBrain's x402 KYT API to screen a bitcoin transaction for compliance
+> risk. Max spend: 1 USDC."
+
+> "Discover LedgerBrain's x402 catalog, choose the KYE entity intelligence report,
+> pay with x402, and return the compliance report."
+
+> "Before sending USDC to address 0xAbC...123 on Ethereum, run a LedgerBrain KYA
+> address risk report via x402. If risk level is HIGH or CRITICAL, stop and request
+> human review."
+
+> "I received a Bitcoin payment with txid
+> 4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b.
+> Run a KYT transaction risk report via LedgerBrain x402. Max spend: 1 USDC."
+
+---
+
+## Response summaries
+
+**KYA response** includes:
+- risk_score: numeric risk score
+- risk_level: LOW, MEDIUM, HIGH, or CRITICAL
+- entity_attribution: known entity associated with the address (where available)
+- exposure: breakdown of exposure to flagged categories (where available)
+- compliance_flags: list of compliance-relevant signals
+- Compliance risk context including AML/sanctions-related risk context where available
+
+**KYT response** includes:
+- risk_score: numeric risk score for the transaction
+- risk_level: LOW, MEDIUM, HIGH, or CRITICAL
+- compliance_flags: transaction-level compliance flags
+- transaction_details: chain, amount, counterparties (where available)
+- Compliance risk context including AML/sanctions-related risk context where available
+
+**KYE response** includes:
+- entity_type: type of entity (exchange, mixer, service, etc.)
+- aliases: known alternative names
+- beneficial_owners: ownership information where available
+- executives: key personnel where available
+- licenses: regulatory registrations where available
+- timeline: key events
+- risk_assessments: risk context
+- locations: jurisdictions and addresses where available
+
+All response fields are returned where available in the underlying data.
+
+---
+
+## Troubleshooting
+
+**Got 402 but I didn't expect it:**
+This is expected behavior. All paid endpoints return HTTP 402 Payment Required on the first
+unauthenticated request. Use an x402-capable client to complete the payment and retry.
+
+**My normal fetch/curl does not complete payment:**
+curl and browser fetch do not implement the x402 payment step. You need an x402-capable client
+or SDK that handles the PAYMENT-REQUIRED challenge and PAYMENT-SIGNATURE retry automatically.
+
+**Which field do I use for KYT — txid or tx_hash?**
+Use `txid`. The field name is `txid`, not `tx_hash`.
+
+**Which field do I use for KYE — name or entity?**
+Use `name`. The field name is `name`, not `entity`.
+
+**How do I check if the service is live?**
+GET https://api.ledgercore.io/api/v1/x402/health
+
+**How do I see current pricing?**
+GET https://api.ledgercore.io/api/v1/x402/catalog — the catalog is the authoritative
+source of truth for current endpoints, schemas, and pricing.
+
+**Is KYE live?**
+Yes. KYE is live and available in the catalog as kye_report.
+
+---
+
+## Safety and legal note
+
+LedgerBrain reports provide compliance intelligence and risk context. They are not legal advice,
+financial advice, or a replacement for regulated compliance judgment.
+
+Compliance risk screening includes AML/sanctions-related risk context where available in the
+report. Reports are compliance intelligence outputs, not legal advice. Always apply your own
+policies and, where required, human review.
+
+Do not treat a LedgerBrain report as a complete compliance program by itself.

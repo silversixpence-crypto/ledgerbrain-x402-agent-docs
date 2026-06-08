@@ -1,0 +1,20 @@
+{
+  "projectTitle": "LedgerBrain x402 Agent Docs",
+  "description": "Agent-facing documentation for LedgerBrain / LedgerCore x402 pay-per-use KYA, KYT, and KYE crypto compliance reports.",
+  "folders": ["docs", "examples"],
+  "excludeFolders": [".git", ".github", "node_modules"],
+  "rules": [
+    "Use the live x402 catalog as source of truth: https://api.ledgercore.io/api/v1/x402/catalog",
+    "Use x402 v2 payment flow.",
+    "Payment challenge is returned with PAYMENT-REQUIRED.",
+    "Payment retry uses PAYMENT-SIGNATURE.",
+    "Payment token is USDC on Base mainnet.",
+    "No LedgerBrain API key is required for x402 endpoints.",
+    "Use KYA for address risk, KYT for transaction risk, and KYE for entity due diligence.",
+    "KYT request uses txid, not tx_hash.",
+    "KYE request uses name, not entity.",
+    "KYA, KYT, and KYE are all live paid endpoints confirmed in the catalog.",
+    "Do not treat LedgerBrain reports as legal advice.",
+    "Compliance risk screening includes AML/sanctions-related risk context where available in the report."
+  ]
+}

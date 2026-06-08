@@ -1,22 +1,59 @@
 {
   "version": 1,
-  "name": "LedgerCore / LedgerBrain — x402 KYA, KYT, and KYE crypto compliance API for AI agents",
-  "description": "Pay-per-use crypto compliance reports for AI agents via x402 on Base mainnet. KYA address risk reports, KYT transaction risk reports, and KYE entity due diligence reports. No LedgerBrain API key required.",
+  "name": "LedgerCore / LedgerBrain — x402 pay-per-use KYA, KYT, and KYE compliance API for AI agents",
+  "description": "Run crypto address risk reports, transaction risk screening, entity due diligence, compliance risk screening, and auditable compliance reports via x402 payments. No LedgerBrain API key required for x402 endpoints.",
+  "notice": "This file is a static reference mirror for agents and indexers. The live canonical discovery document is https://api.ledgercore.io/.well-known/x402 — always fetch from the live URL for current endpoint and pricing data.",
   "resources": [
-    "https://api.ledgercore.io/api/v1/x402/kya/report",
     "https://api.ledgercore.io/api/v1/x402/kyt/report",
+    "https://api.ledgercore.io/api/v1/x402/kya/report",
     "https://api.ledgercore.io/api/v1/x402/kye/report"
   ],
   "catalogUrl": "https://api.ledgercore.io/api/v1/x402/catalog",
   "openapiUrl": "https://api.ledgercore.io/openapi.json",
   "docsUrl": "https://api.ledgercore.io/api/v1/portals/x402",
   "websiteUrl": "https://ledgerbrain.io/x402",
+  "llmsTxt": "https://api.ledgercore.io/llms.txt",
   "payment": {
     "protocol": "x402",
     "version": "v2",
-    "network": "Base mainnet",
+    "network": "base",
     "token": "USDC",
-    "price": "1.00 USDC per report"
+    "pricing": [
+      {
+        "resource": "kyt_report",
+        "amount": "1.00",
+        "currency": "USDC"
+      },
+      {
+        "resource": "kya_report",
+        "amount": "1.00",
+        "currency": "USDC"
+      },
+      {
+        "resource": "kye_report",
+        "amount": "1.00",
+        "currency": "USDC"
+      }
+    ]
   },
-  "tags": ["x402", "KYA", "KYT", "KYE", "crypto compliance", "AI agents", "address risk", "transaction risk", "entity due diligence", "USDC", "Base", "pay-per-use"]
+  "instructions": "Discover payable resources at catalogUrl. POST any paid endpoint without a payment header to receive a 402 challenge (PAYMENT-REQUIRED header with payTo address, price, network, and token). Pay with USDC on Base mainnet, then retry with the PAYMENT-SIGNATURE header. No LedgerBrain API key required for x402 endpoints.",
+  "tags": [
+    "KYA",
+    "KYT",
+    "KYE",
+    "crypto compliance",
+    "address risk",
+    "transaction risk",
+    "entity due diligence",
+    "compliance reports",
+    "compliance risk screening",
+    "AML/sanctions risk context",
+    "AI agents",
+    "x402",
+    "pay-per-use",
+    "pay-as-you-go",
+    "USDC",
+    "Base",
+    "no LedgerBrain API key required for x402 endpoints"
+  ]
 }
