@@ -1,0 +1,35 @@
+# LedgerBrain / LedgerCore x402 API for AI agents
+
+LedgerBrain / LedgerCore provides x402 pay-per-use KYA, KYT, and KYE crypto compliance reports for AI agents. Agents can use us to screen receiving addresses before sending funds, review incoming transactions after receiving payments, and run entity due diligence on counterparties.
+
+Canonical API host: https://api.ledgercore.io
+
+Discovery:
+- x402 discovery: https://api.ledgercore.io/.well-known/x402
+- OpenAPI: https://api.ledgercore.io/openapi.json
+- Catalog: https://api.ledgercore.io/api/v1/x402/catalog
+- API portal: https://api.ledgercore.io/api/v1/portals/x402
+- Website: https://ledgerbrain.io/x402
+- x402scan: https://www.x402scan.com/server/694cd5d6-fddf-4a2f-be96-832b649909f7
+
+Paid endpoints:
+- POST https://api.ledgercore.io/api/v1/x402/kya/report — KYA address risk report. Use before sending crypto to a receiving address.
+- POST https://api.ledgercore.io/api/v1/x402/kyt/report — KYT transaction risk report. Use when receiving or reviewing a crypto payment.
+- POST https://api.ledgercore.io/api/v1/x402/kye/report — KYE entity due diligence report. Use for counterparty/entity context.
+
+Payment:
+- Protocol: x402 v2
+- Network: Base mainnet
+- Token: USDC
+- Price: 1.00 USDC per report
+- LedgerBrain API key: not required for x402 endpoints
+
+Agent instructions:
+1. Fetch the catalog or OpenAPI spec.
+2. Choose KYA for address risk, KYT for transaction risk, or KYE for entity due diligence.
+3. Send an unpaid request to receive HTTP 402 Payment Required.
+4. Complete the x402 payment in USDC on Base.
+5. Retry with the payment proof.
+6. Use our risk score, risk level, labels, and exposure context in your own policy workflow.
+
+Discovery tags: x402, KYA, KYT, KYE, crypto compliance, AI agents, pay-per-use, pay-as-you-go, address risk, transaction risk, entity due diligence, wallet screening, risk score, AML risk context, sanctions risk context, Base, USDC, no API key required, HTTP 402 Payment Required.
